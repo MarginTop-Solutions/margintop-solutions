@@ -9,11 +9,11 @@ const Why = () =>{
         {
             title:"STRATEGY",
             buttets:[
-                'Analytics and Research',
-                'Interactive Workshops',
                 'Brand Strategy',
                 'Content Strategy',
                 'Digital Strategy',
+                'Interactive Workshops',
+                'Analytics and Research',
             ]
         },
         {
@@ -45,12 +45,12 @@ const Why = () =>{
                 <h1 className='text-[#e5e5e5] text-[16px]'>Let us tell you a bit</h1>
                 <h1 className='font-semibold text-white'>Why we are the BEST in Business</h1>
             </div>
-            <div className='content flex flex-wrap gap-6 items-start sm:items-center justify-between py-12'>
+            <div className='content flex sm:flex-col flex-wrap gap-6 items-start sm:items-center justify-between py-12'>
                 {
                     data.map((item, key)=>(
-                        <div key={key} className={`flex w-[30%] flex-col items-start justify-start gap-4 ${key==1? 'items-center': key==2? 'items-end':'items-start'}`}>
-                            <h1 className={`font-bold text-white text-[18px] ${key==1 ? 'text-center': key==2?'text-end':'text-start'}`}>{item.title}</h1>
-                            <div className={`flex flex-col items-start justify-start gap-2 ${key==1 ? 'items-center':key==2?'items-end':'items-start'}`}>
+                        <div key={key} className={`flex sm:px-8 w-[30%] sm:w-full flex-col items-start sm:items-center justify-start gap-4 ${key==1? 'items-center sm:items-end': key==2? 'items-end sm:items-start':'items-start'}`}>
+                            <h1 className={`font-bold sm:w-full text-white text-[18px] ${key==1 ? 'text-center sm:text-end': key==2?'text-end sm:text-start':'text-start'}`}>{item.title}</h1>
+                            <div className={`flex flex-col items-start sm:w-full justify-start gap-2 ${key==1 ? 'items-center sm:items-end':key==2?'items-end sm:items-start':'items-start'}`}>
                                 {
                                     item.buttets.map((bullet, id)=>(
                                         <p className='text-white/80' key={id}>{bullet}</p>

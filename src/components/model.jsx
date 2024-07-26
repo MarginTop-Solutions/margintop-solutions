@@ -1,34 +1,25 @@
-import { useGLTF, useFBX } from "@react-three/drei";
-import { useLoader } from "@react-three/fiber";
-import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+import { useFrame } from "@react-three/fiber";
+import { useRef } from "react";
 
-export const ModelTypes = {
-    gltf : 1,
-    glb  : 2,
-    fbx  : 3
-};
 
-export default function Model({path, position=[0,0,0], scale=1, type = ModelTypes.gltf}){
-    const getLoader = ()=>{
-        switch(type){
-            case ModelTypes.gltf:
-                return useGLTF;
-            case ModelTypes.glb:
-                return useGLTF;
-            case ModelTypes.fbx:
-                return useFBX;
-            default:
-                return useGLTF;
-        }
-    }
+export default function Model({ model, position = [0,0,0], scale=[1,1,1], rotation=[0,0,0], rotationSpeed = [0, 0, .1] }) {
 
-    //const loader = getLoader();
-    // const model = loader(path);
-    const model = useLoader(GLTFLoader, path);
+    const meshRef = useRef();
+
+    useFrame((_, delta) => {
+        meshRef.current.rotation.x += delta * rotationSpeed[0];
+        meshRef.current.rotation.y += delta * rotationSpeed[1];
+        meshRef.current.rotation.z += delta * 0.1;
+    });
 
     return (
-        <mesh>
-            <primitive object={model.scene} scale={scale} position={position} />
+        <mesh ref={meshRef} position={position} >
+            <primitive
+                object={model.scene.clone()}
+                scale={scale}
+                rotation={rotation}
+            />
         </mesh>
     )
 }
+

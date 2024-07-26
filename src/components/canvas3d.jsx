@@ -9,32 +9,32 @@ import { getLoader, ModelTypes } from "./utils/loader";
 import Clones from "./clones";
 
 export default function Canvas3D({className}){
-    const offset = [0,-.3,0];
+  const offset = [0,-.3,0];
 
     const loader = getLoader(ModelTypes.glb);
-    const model = loader("/assets/trail.glb");
+    const model = loader("/assets/car.glb");
 
 
     return (
         <div className = {className}>
-        <Canvas shadows camera={{ position: [0, 0, 2], fov: 50 }} >
-        <Suspense fallback={null}>
-            <Bg />
-            <mesh position={offset}>
-                <sphereGeometry args={[0.2, 64, 64]} />
-                <meshPhysicalMaterial transmission={1} thickness={10} roughness={0.1} />
-            </mesh>
-            
-            <Model model = {model} scale={0.05} />
-            <Clones model={model} scaleMin={0.1} scaleMax={1} count={10}/>
-            
-            <StatsGl className="stats" showPanel={2}/>
-            <Stats />
-            <OrbitControls autoRotate={false} autoRotateSpeed={30}/>
-            <directionalLight intensity={2} castShadow shadow-mapSize-height={1024} shadow-mapSize-width={1024} />
-            <ambientLight intensity={1} />
-        </Suspense>
-        </Canvas>
+          <Canvas shadows camera={{ position: [8, 4, 3], fov: 90 }} >
+            <Suspense fallback={null}>
+                {/* <Bg /> */}
+                {/* <mesh position={offset}>
+                    <sphereGeometry args={[0.2, 64, 64]} />
+                    <meshPhysicalMaterial transmission={1} thickness={10} roughness={0.1} />
+                </mesh> */}
+                
+                <Model model = {model} scale={2} />
+                {/* <Clones model={model} scaleMin={0.1} scaleMax={1} count={10}/> */}
+                
+                <StatsGl className="stats" showPanel={2}/>
+                <Stats />
+                {/* <OrbitControls autoRotate={false} autoRotateSpeed={30}/> */}
+                <directionalLight intensity={2} castShadow shadow-mapSize-height={1024} shadow-mapSize-width={1024} />
+                <ambientLight intensity={1} />
+            </Suspense>
+          </Canvas>
         </div>
     )
 }

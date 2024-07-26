@@ -4,6 +4,7 @@ import { IoLogoLinkedin } from "react-icons/io5";
 import { IoLogoWhatsapp } from "react-icons/io";
 import { FaArrowRight } from "react-icons/fa6";
 import Canvas3D from './canvas3d';
+import Canvas2 from './testcanvas';
 
 const Landing = () =>{
     const date = new Date()
@@ -37,7 +38,9 @@ const Landing = () =>{
                     <a target='_blank' href="https://wa.me/+9779845926945?text=Hi%20!%20I%20got%20to%20know%20about%20MarginTop%20Solutions,%20I%20was%20thinking%20to%20work%20on%20a%20project!%20Can%20you%20help%20me%3F" className=' text-[#2D3031]'><IoLogoWhatsapp/></a>
                 </div>
             </div>
-            <Canvas3D className="w-full h-full z-[-5] absolute top-0 left-0" />
+            <Canvas2 className="w-full h-full z-[-5] absolute top-0 left-0" />
+            <Canvas3D className="w-full h-full z-[5] absolute top-0 left-0" />
+
         </div>
 
     )

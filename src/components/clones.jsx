@@ -1,17 +1,22 @@
 import { useFrame } from "@react-three/fiber";
-import { useEffect, useRef } from "react"
+import {useMemo, useRef } from "react"
+import { Vector3 } from "three";
 
-export default function Clones({ model, scaleMin=1, scaleMax=2, count=-1, positions = [], spread = [1,1,1], rotationSpeed = [0,.2,1]}) {
+export default function Clones({ model, scaleMin=0.1, scaleMax=1, count=-1, positions = [], spread = [1,1,1], rotationSpeed = [0,0,0]}) {
 
     const meshRef = useRef();
+    const clones = useMemo(() => Array.from({length:count}, _=>model.scene.clone()), [count, model]);
 
-    const _pos = [];
-    useEffect(() => {
+    const clonePoses = useMemo(() =>{
+        const _pos = [];
         const _count = Math.max(count, positions.length);
+        var _tp;
         for(let i=0; i<_count; i++){
-            if(i<positions.length) _pos.push(positions[i]);
-            else _pos.push([Math.random()*spread[0], Math.random()*spread[1], Math.random()*spread[2]])
+            if(i<positions.length) _tp = new Vector3(positions[i][0],positions[i][1],positions[i][2]);
+            else _tp = new Vector3(Math.random()*spread[0], Math.random()*spread[1], Math.random()*spread[2]);
+            _pos.push(_tp);
         }
+        return _pos;
     }, [count, positions]);
 
     useFrame((_, delta) => {
@@ -22,14 +27,13 @@ export default function Clones({ model, scaleMin=1, scaleMax=2, count=-1, positi
         });
     });
 
-    const offs = Array.from({length:count}, (_, i)=>[0,0,-1.2*i]);
-
+    console.log(clonePoses);
     return (
         <group ref={meshRef}>
-            {offs.map((pos, i) => (
+            {clonePoses.map((pos, i) => (
                 <mesh position={pos} key={i}>
                     <primitive
-                        object={model.scene.clone()}
+                        object={clones[i]}
                         scale={scaleMin + Math.random() * (scaleMax-scaleMin)}
                         rotation={[0, 0, i * 0.5]}
                     />

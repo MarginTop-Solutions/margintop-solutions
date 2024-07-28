@@ -1,38 +1,47 @@
 import { OrbitControls, Stats, Preload, useGLTF, Stage, StatsGl } from "@react-three/drei";
-import { Canvas, useFrame} from "@react-three/fiber";
+import { Canvas, useFrame, useLoader} from "@react-three/fiber";
 import { Suspense, useEffect, useState, useRef } from "react";
 import { DebugLayerMaterial, LayerMaterial, Depth, Color, Fresnel, Noise, Normal } from 'lamina'
 import * as THREE from 'three';
+import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 
 import Model from "./model";
 import { getLoader, ModelTypes } from "./utils/loader";
 import Clones from "./clones";
+import ModelInstances from "./instances";
 
 export default function Canvas3D({className}){
     const offset = [0,-.3,0];
+    const count = 100;
 
-    const loader = getLoader(ModelTypes.glb);
-    const model = loader("/assets/trail.glb");
+    //const loader = getLoader(ModelTypes.glb);
+    //const model = loader("/assets/trail.glb");
+    const model = useLoader(GLTFLoader, "/assets/trail.glb");
 
+    const offs = Array.from({length:count}, (_, i)=>[0,0,-i*3+45]);
 
     return (
         <div className = {className}>
-        <Canvas shadows camera={{ position: [0, 0, 2], fov: 50 }} >
+        <Canvas shadows camera={{ position: [0, 0, 50], fov: 50 }} >
         <Suspense fallback={null}>
             <Bg />
             <mesh position={offset}>
-                <sphereGeometry args={[0.2, 64, 64]} />
+                <sphereGeometry args={[1, 64, 64]} />
                 <meshPhysicalMaterial transmission={1} thickness={10} roughness={0.1} />
             </mesh>
             
-            <Model model = {model} scale={0.05} />
-            <Clones model={model} scaleMin={0.1} scaleMax={1} count={10}/>
-            
+            <Model model = {model} scale={1} />
+        {/*<Clones model={model} scaleMin={0.1} scaleMax={.1} count={count} positions={offs} rotationSpeed={[0,0,1]}/> */}
+            <ModelInstances model={model} positions={offs} scaleMin={.2} scaleMax={1} />
+
             <StatsGl className="stats" showPanel={2}/>
-            <Stats />
-            <OrbitControls autoRotate={false} autoRotateSpeed={30}/>
+            <Stats className="stats" />
+
+            <OrbitControls autoRotate={false} autoRotateSpeed={20}/>
+
             <directionalLight intensity={2} castShadow shadow-mapSize-height={1024} shadow-mapSize-width={1024} />
             <ambientLight intensity={1} />
+            <Preload all />
         </Suspense>
         </Canvas>
         </div>

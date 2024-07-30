@@ -1,8 +1,29 @@
+import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from 'three';
-import { Vector3 } from "three";
+import { Euler, Matrix4, Quaternion, Vector3 } from "three";
+import { getLoader, ModelTypes } from "./utils/loader";
 
-export default function ModelInstances({ model, scaleMin=1, scaleMax=1, count=10, positions = [], spread = [1,1,1], rotationSpeed = [0,0,0] }) {
+/*
+    count should always be set
+    - set positions to list of coordinates for each model-instance if you have predefined positions
+    - leave positions empty and set spread to some value along with offset to randomly
+    place instances in different positions
+*/
+
+export default function ModelInstances({ 
+    path,
+    type = ModelTypes.glb,
+    count = 1,
+    positions = [],
+    spread = {x:1, y:1, z:1}, offset = {x:0, y:0, z:0},
+    scaleMin = 0.1, scaleMax = 1,
+    rotationSpeed = {x:0, y:0, z:0}
+}) {
+
+    const loader = getLoader(type);
+    const model = loader(path);
+
     const temp = new THREE.Object3D();
     const instancedMeshRef = useRef();
 
@@ -31,7 +52,10 @@ export default function ModelInstances({ model, scaleMin=1, scaleMax=1, count=10
         const _count = Math.max(count, positions.length);
 
         const instancedMesh = new THREE.InstancedMesh(geometry, material, _count);
-        mesh.children.forEach(c => mesh.remove(c));
+        mesh.children.forEach(c => {
+            c.dispose();  // *** very important for preventing resource leak ***
+            mesh.remove(c)
+        });
         mesh.add(instancedMesh);
 
         instancedMesh.scale.copy(scale);
@@ -39,8 +63,15 @@ export default function ModelInstances({ model, scaleMin=1, scaleMax=1, count=10
 
         var _tp;
         for (let i = 0; i < _count; i++) {
-            if(i<positions.length) _tp = new Vector3(positions[i][0],positions[i][1],positions[i][2]);
-            else _tp = new Vector3(Math.random()*spread[0], Math.random()*spread[1], Math.random()*spread[2]);
+            _tp = new Vector3();
+            if (i < positions.length) _tp.set(positions[i].x, positions[i].y, positions[i].z);
+            else {
+                _tp.set(
+                    offset.x + (Math.random() - 0.5) * spread.x,
+                    offset.y + (Math.random() - 0.5) * spread.y,
+                    offset.z + (Math.random() - 0.5) * spread.z
+                );
+            }
 
             temp.position.copy(_tp);
             temp.scale.copy(scale);
@@ -54,7 +85,35 @@ export default function ModelInstances({ model, scaleMin=1, scaleMax=1, count=10
         instancedMesh.instanceMatrix.needsUpdate = true;
     }, [model, count, positions]);
 
-    console.log(instancedMeshRef);
+    console.log(instancedMeshRef.current?.children[0]);
+
+    useFrame((_, del) => {
+        const mesh = instancedMeshRef.current?.children[0];
+        if(!mesh) return;
+
+        var mat = new Matrix4();
+
+        // deez variables are only used to pool values
+        var rot = new Quaternion();
+        var e_rot = new Euler();
+        var pos = new Vector3();
+        var scale = new Vector3();
+
+        for(let i=0; i < mesh.count; i++){
+            mesh.getMatrixAt(i, mat);
+            mat.decompose(pos, rot, scale);
+            e_rot.setFromQuaternion(rot);
+
+            e_rot.x += del * rotationSpeed.x;
+            e_rot.y += del * rotationSpeed.y;
+            e_rot.z += del * rotationSpeed.z;
+
+            rot.setFromEuler(e_rot);
+            mat.compose(pos, rot, scale);
+            mesh.setMatrixAt(i, mat);
+        }
+        mesh.instanceMatrix.needsUpdate = true;
+    });
 
     return (
         <group ref={instancedMeshRef} />

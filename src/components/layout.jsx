@@ -4,7 +4,7 @@ import CursorFollower from './cursorfollower';
 const Layout  = ({children}) =>{
     return(
         <div>
-            <CursorFollower />
+            {/* <CursorFollower /> */}
             {children}
       </div>
     )
